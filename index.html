@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materiale & Byggeteknik Bibliotek</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f4f0;
+      --surface: #ffffff;
+      --surface-alt: #ede9e1;
+      --text: #1e201d;
+      --text-muted: #5c6058;
+      --border: #dcd6cb;
+      --accent: #2d4f3e;
+      --accent-hover: #213b2e;
+      --accent-light: #e3ece7;
+      --tech-badge: #3b4d5e;
+      --danger: #b93829;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(30, 32, 29, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* --- AUTH SCREEN --- */
+    .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 28px;
+      box-shadow: 0 12px 34px rgba(30, 32, 29, 0.08);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .auth-header .brand-icon {
+      margin: 0 auto 12px;
+      width: 48px;
+      height: 48px;
+      font-size: 1.25rem;
+    }
+
+    .auth-header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    .auth-header p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .auth-tab {
+      padding: 8px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .auth-error {
+      background: #fdf2f0;
+      color: var(--danger);
+      border: 1px solid #f5c6cb;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 16px 24px;
+    }
+
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+    }
+
+    .brand h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .db-status {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d97706;
+      display: inline-block;
+    }
+
+    .status-dot.connected {
+      background: #16a34a;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface-alt);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #e2ddd3;
+    }
+
+    .btn-danger {
+      background: #fdf2f0;
+      color: var(--danger);
+      border-color: #f5c6cb;
+    }
+
+    .btn-danger:hover {
+      background: #f8d7da;
+    }
+
+    /* Controls Bar */
+    .controls-section {
+      max-width: 1280px;
+      margin: 24px auto 16px;
+      padding: 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 11px 16px 11px 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45, 79, 62, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-tabs {
+      display: flex;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+    }
+
+    .filter-tab {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* Grid */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 22px;
+      margin-top: 16px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(30, 32, 29, 0.11);
+    }
+
+    .card-img-wrap {
+      width: 100%;
+      height: 220px;
+      background: var(--surface-alt);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-img-wrap img {
+      transform: scale(1.02);
+    }
+
+    .card-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      background: linear-gradient(135deg, #eae5dc 0%, #ded8cc 100%);
+    }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+    .badge.materiale {
+      background: rgba(45, 79, 62, 0.9);
+      color: #fff;
+    }
+
+    .badge.byggeteknik {
+      background: rgba(59, 77, 94, 0.9);
+      color: #fff;
+    }
+
+    /* Card Image Slider Controls */
+    .img-count-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(20, 22, 19, 0.72);
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+      z-index: 2;
+    }
+
+    .card-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.15s ease, background 0.15s ease;
+      z-index: 3;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .card-img-wrap:hover .card-nav-btn {
+      opacity: 1;
+    }
+
+    .card-nav-btn:hover {
+      background: #ffffff;
+    }
+
+    .card-nav-btn.prev { left: 10px; }
+    .card-nav-btn.next { right: 10px; }
+
+    .card-body {
+      padding: 18px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      white-space: pre-line;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-footer {
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-link {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
+    .icon-btn:hover {
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      max-width: 620px;
+      margin: 40px auto;
+    }
+
+    .empty-state h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 20px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 22, 19, 0.55);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      line-height: 1;
+    }
+
+    /* Smart Paste Box */
+    .smart-paste-box {
+      background: var(--accent-light);
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .smart-paste-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .smart-paste-box textarea {
+      width: 100%;
+      height: 70px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #bfd2c7;
+      font-family: inherit;
+      font-size: 0.84rem;
+      resize: vertical;
+      background: #fff;
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    textarea.desc-input {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* Multi-Image Input & Gallery Strip */
+    .url-add-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .url-add-row input {
+      flex: 1;
+    }
+
+    .image-dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .image-dropzone:hover,
+    .image-dropzone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .form-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .form-thumb-item {
+      position: relative;
+      height: 86px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: var(--surface-alt);
+      cursor: pointer;
+    }
+
+    .form-thumb-item.is-cover {
+      border-color: var(--accent);
+    }
+
+    .form-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cover-label {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(45, 79, 62, 0.92);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .remove-thumb-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      border: none;
+      font-size: 0.85rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-thumb-btn:hover {
+      background: var(--danger);
+    }
+
+    /* Detail Modal Gallery */
+    .detail-gallery-wrap {
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .detail-main-stage {
+      position: relative;
+      width: 100%;
+      height: 390px;
+      background: #141613;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-main-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .stage-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      border: none;
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .stage-nav-btn:hover {
+      background: #fff;
+    }
+
+    .stage-nav-btn.prev { left: 14px; }
+    .stage-nav-btn.next { right: 14px; }
+
+    .detail-thumbs-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 10px;
+    }
+
+    .detail-thumb {
+      width: 76px;
+      height: 56px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0.55;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .detail-thumb.active,
+    .detail-thumb:hover {
+      opacity: 1;
+      border-color: var(--accent);
+    }
+
+    .detail-desc {
+      white-space: pre-line;
+      font-size: 0.96rem;
+      line-height: 1.65;
+      color: var(--text);
+      margin: 16px 0;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .detail-main-stage {
+        height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN / AUTH SKÆRM -->
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-icon">MB</div>
+        <h1>Materiale & Byggeteknik</h1>
+        <p>Log ind med din Firebase-konto (tempco2fugt)</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tabLoginBtn" onclick="setAuthMode('login')">Log ind</button>
+        <button type="button" class="auth-tab" id="tabRegisterBtn" onclick="setAuthMode('register')">Opret bruger</button>
+      </div>
+
+      <div id="authErrorBox" class="auth-error"></div>
+
+      <form id="authForm" onsubmit="handleEmailAuth(event)">
+        <div class="form-group">
+          <label for="authEmail">E-mail</label>
+          <input type="email" id="authEmail" required placeholder="din@email.dk" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Adgangskode</label>
+          <input type="password" id="authPassword" required minlength="6" placeholder="Mindst 6 tegn" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="authSubmitBtn" style="width: 100%; margin-top: 6px;">
+          Log ind
+        </button>
+      </form>
+
+      <div class="auth-divider">eller</div>
+
+      <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="handleGoogleAuth()">
+        🌐 Fortsæt med Google
+      </button>
+    </div>
+  </section>
+
+  <!-- HOVED-APP (Skjult indtil brugeren er logget ind) -->
+  <div id="appShell" style="display: none;">
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">MB</div>
+          <div>
+            <h1>Materiale & Byggeteknik Bibliotek</h1>
+            <div class="db-status">
+              <span id="statusDot" class="status-dot"></span>
+              <span id="statusText">Forbinder til Firestore (tempco2fugt)...</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="user-pill" id="userEmailDisplay">👤 Logget ind</span>
+          <button class="btn btn-primary" onclick="openFormModal()">
+            + Tilføj nyt (eller Ctrl+V)
+          </button>
+          <button class="btn btn-secondary" onclick="handleLogout()">
+            Log ud
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Søg i materialer, teknikker, projekter eller tags (f.eks. 'træ', 'hamp', 'CNC')..." oninput="renderCards()" />
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="alle" onclick="setFilter('alle', this)">Alle (<span id="countAll">0</span>)</button>
+        <button class="filter-tab" data-filter="Materiale" onclick="setFilter('Materiale', this)">🌱 Materialer (<span id="countMat">0</span>)</button>
+        <button class="filter-tab" data-filter="Byggeteknik" onclick="setFilter('Byggeteknik', this)">🏗️ Byggeteknik (<span id="countTech">0</span>)</button>
+      </div>
+    </section>
+
+    <main class="container">
+      <div id="cardsGrid" class="grid"></div>
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <h3>Dit bibliotek er tomt endnu</h3>
+        <p>Tilføj dit første bæredygtige materiale eller byggeteknik – eller indlæs de to eksempler fra vores chat (med flere billeder) med ét klik herunder.</p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="openFormModal()">+ Opret første opslag</button>
+          <button class="btn btn-secondary" id="seedBtn" onclick="seedStarterExamples()">⚡ Indlæs Hampbeton & Tamedia-eksemplerne</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- OPRET / REDIGER MODAL -->
+  <div id="formModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Tilføj til bibliotek</h2>
+        <button class="close-btn" onclick="closeFormModal()">&times;</button>
+      </div>
+
+      <!-- Hurtig indsæt fra Gemini -->
+      <div class="smart-paste-box">
+        <div class="smart-paste-header">
+          <span>⚡ Smart-indsæt tekst fra Gemini-opdatering</span>
+          <span style="font-weight: 400; font-size: 0.78rem;">Udfylder automatisk felterne herunder</span>
+        </div>
+        <textarea id="smartPasteInput" placeholder="Kopiér en blok fra Gemini (f.eks. '### 1. Materiale: Hampbeton...') og sæt den ind her..." oninput="handleSmartPaste(this.value)"></textarea>
+      </div>
+
+      <form id="libraryForm" onsubmit="saveItem(event)">
+        <input type="hidden" id="itemId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="titleInput">Titel *</label>
+            <input type="text" id="titleInput" required placeholder="F.eks. Hampbeton (Hempcrete)" />
+          </div>
+
+          <div class="form-group">
+            <label for="categoryInput">Kategori *</label>
+            <select id="categoryInput">
+              <option value="Materiale">🌱 Materiale</option>
+              <option value="Byggeteknik">🏗️ Byggeteknik</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Billeder (<span id="formImgCount">0</span> tilføjet – tryk Ctrl+V flere gange, tilføj URLs eller vælg filer)</label>
+            <div class="url-add-row">
+              <input type="text" id="imageUrlInput" placeholder="Indsæt billed-URL og tryk Enter eller 'Tilføj URL'..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addImageFromUrlInput();}" />
+              <button type="button" class="btn btn-secondary" onclick="addImageFromUrlInput()">+ Tilføj URL</button>
+            </div>
+
+            <div class="image-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+              <span style="font-size: 0.83rem; color: var(--text-muted);">
+                📋 <strong>Ctrl + V</strong> for at indsætte kopierede billeder (du kan indsætte så mange du vil i træk) — eller klik / træk flere billedfiler herind
+              </span>
+              <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFileSelect(event)" />
+            </div>
+
+            <!-- Liste over valgte billeder -->
+            <div id="formGalleryGrid" class="form-gallery-grid"></div>
+          </div>
+
+          <div class="form-group full">
+            <label for="descInput">Beskrivelse & Eksempel i praksis *</label>
+            <textarea id="descInput" class="desc-input" required placeholder="Kort beskrivelse af materialet/teknikken samt konkret projekt-eksempel..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="linkInput">Link til artikel</label>
+            <input type="url" id="linkInput" placeholder="https://www.dezeen.com/..." />
+          </div>
+
+          <div class="form-group">
+            <label for="tagsInput">Tags (komma-separeret)</label>
+            <input type="text" id="tagsInput" placeholder="Biobaseret, Træ, CO2-negativ, Præfab" />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeFormModal()">Annuller</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Gem i Firestore</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETALJE MODAL (MED GALLERI) -->
+  <div id="detailModal" class="modal-backdrop" onclick="if(event.target===this) closeDetailModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <span id="detailBadge" class="badge" style="position: static; display: inline-block; margin-bottom: 6px;"></span>
+          <h2 id="detailTitle"></h2>
+        </div>
+        <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div id="detailGalleryWrap" class="detail-gallery-wrap">
+        <div class="detail-main-stage">
+          <button type="button" id="stagePrevBtn" class="stage-nav-btn prev" onclick="stepDetailImage(-1)">‹</button>
+          <img id="detailMainImg" src="" alt="" />
+          <button type="button" id="stageNextBtn" class="stage-nav-btn next" onclick="stepDetailImage(1)">›</button>
+        </div>
+        <div id="detailThumbsRow" class="detail-thumbs-row"></div>
+      </div>
+
+      <div id="detailTags" class="card-tags"></div>
+      <div id="detailDesc" class="detail-desc"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
+        <a id="detailLink" href="#" target="_blank" rel="noopener" class="btn btn-primary">🔗 Læs fuld artikel</a>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" id="detailEditBtn">✏️ Rediger / Tilføj billeder</button>
+          <button class="btn btn-danger" id="detailDeleteBtn">Slet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqEJ5yRtTB1KjAG0RmnEsDNiXFJBKwUxo",
+      authDomain: "tempco2fugt.firebaseapp.com",
+      databaseURL: "https://tempco2fugt-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "tempco2fugt",
+      storageBucket: "tempco2fugt.firebasestorage.app",
+      messagingSenderId: "1068932962336",
+      appId: "1:1068932962336:web:c827d5b933be5ba45a4445",
+      measurementId: "G-TKHQWSE3DR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const colRef = collection(db, "material_library");
+
+    let items = [];
+    let currentFilter = "alle";
+    let formImages = [];
+    let cardImageIndexMap = {};
+    let activeDetailImages = [];
+    let activeDetailIndex = 0;
+    let authMode = "login";
+    let unsubscribeSnapshot = null;
+
+    // --- AUTHENTICATION LOGIK ---
+    window.setAuthMode = (mode) => {
+      authMode = mode;
+      document.getElementById("tabLoginBtn").classList.toggle("active", mode === "login");
+      document.getElementById("tabRegisterBtn").classList.toggle("active", mode === "register");
+      document.getElementById("authSubmitBtn").textContent = mode === "login" ? "Log ind" : "Opret bruger";
+      hideAuthError();
+    };
+
+    function showAuthError(msg) {
+      const box = document.getElementById("authErrorBox");
+      box.textContent = msg;
+      box.style.display = "block";
+    }
+
+    function hideAuthError() {
+      const box = document.getElementById("authErrorBox");
+      box.textContent = "";
+      box.style.display = "none";
+    }
+
+    function translateAuthError(err) {
+      const code = err?.code || "";
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+        return "Forkert e-mail eller adgangskode.";
+      }
+      if (code === "auth/email-already-in-use") {
+        return "Denne e-mail er allerede oprettet. Skift til 'Log ind'-fanen.";
+      }
+      if (code === "auth/weak-password") {
+        return "Adgangskoden skal være på mindst 6 tegn.";
+      }
+      if (code === "auth/operation-not-allowed") {
+        return "Denne login-metode er ikke slået til endnu. Gå til Firebase Console -> Authentication -> Sign-in method og aktivér Email/Password (eller Google).";
+      }
+      return "Login-fejl: " + (err?.message || "Ukendt fejl");
+    }
+
+    window.handleEmailAuth = async (e) => {
+      e.preventDefault();
+      hideAuthError();
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      const btn = document.getElementById("authSubmitBtn");
+      btn.disabled = true;
+
+      try {
+        if (authMode === "login") {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+        }
+      } catch (err) {
+        showAuthError(translateAuthError(err));
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.handleGoogleAuth = async () => {
+      hideAuthError();
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        showAuthError(translateAuthError(err));
+      }
+    };
+
+    window.handleLogout = async () => {
+      await signOut(auth);
+    };
+
+    // Lyt til login-status og start/stop Firestore-synkronisering
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("authScreen").style.display = "none";
+        document.getElementById("appShell").style.display = "block";
+        document.getElementById("userEmailDisplay").textContent = `👤 ${user.email || "Logget ind"}`;
+        startFirestoreListener();
+      } else {
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+          unsubscribeSnapshot = null;
+        }
+        items = [];
+        document.getElementById("appShell").style.display = "none";
+        document.getElementById("authScreen").style.display = "flex";
+      }
+    });
+
+    function startFirestoreListener() {
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      const q = query(colRef, orderBy("createdAt", "desc"));
+      unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+        items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        document.getElementById("statusDot").classList.add("connected");
+        document.getElementById("statusText").textContent = `Forbundet til Firestore (${items.length} opslag)`;
+        updateCounts();
+        renderCards();
+      }, (error) => {
+        console.error("Firestore fejl:", error);
+        document.getElementById("statusDot").classList.remove("connected");
+        document.getElementById("statusText").textContent = "Fejl ved forbindelse til Firestore – tjek Firestore regler";
+      });
+    }
+
+    // Hjælpefunktion der sikrer bagudkompatibilitet med både 'images' (array) og 'image' (enkelt streng)
+    function getItemImages(item) {
+      if (Array.isArray(item.images) && item.images.length > 0) {
+        return item.images.filter(Boolean);
+      }
+      if (item.image && typeof item.image === "string" && item.image.trim() !== "") {
+        return [item.image.trim()];
+      }
+      return [];
+    }
+
+    function updateCounts() {
+      document.getElementById("countAll").textContent = items.length;
+      document.getElementById("countMat").textContent = items.filter(i => i.category === "Materiale").length;
+      document.getElementById("countTech").textContent = items.filter(i => i.category === "Byggeteknik").length;
+    }
+
+    window.setFilter = (filter, btnEl) => {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-tab").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
+      renderCards();
+    };
+
+    window.stepCardImage = (event, itemId, dir) => {
+      event.stopPropagation();
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const imgs = getItemImages(item);
+      if (imgs.length <= 1) return;
+
+      const cur = cardImageIndexMap[itemId] || 0;
+      const next = (cur + dir + imgs.length) % imgs.length;
+      cardImageIndexMap[itemId] = next;
+      renderCards();
+    };
+
+    window.renderCards = () => {
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const grid = document.getElementById("cardsGrid");
+      const empty = document.getElementById("emptyState");
+
+      const filtered = items.filter(item => {
+        const matchesCat = currentFilter === "alle" || item.category === currentFilter;
+        const haystack = `${item.title || ""} ${item.description || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
+        const matchesSearch = !search || haystack.includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      if (items.length === 0) {
+        grid.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      } else {
+        empty.style.display = "none";
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-muted);">Ingen resultater matcher din søgning.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const badgeClass = item.category === "Byggeteknik" ? "byggeteknik" : "materiale";
+        const tagsHtml = (item.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+        const imgs = getItemImages(item);
+        const curIdx = Math.min(cardImageIndexMap[item.id] || 0, Math.max(0, imgs.length - 1));
+        const activeImg = imgs[curIdx];
+
+        const imgHtml = activeImg
+          ? `<img src="${escapeHtml(activeImg)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" />`
+          : `<div class="card-placeholder">Intet billede</div>`;
+
+        const multiControlsHtml = imgs.length > 1
+          ? `
+            <span class="img-count-badge">📷 ${curIdx + 1} / ${imgs.length}</span>
+            <button type="button" class="card-nav-btn prev" title="Forrige billede" onclick="stepCardImage(event, '${item.id}', -1)">‹</button>
+            <button type="button" class="card-nav-btn next" title="Næste billede" onclick="stepCardImage(event, '${item.id}', 1)">›</button>
+          `
+          : "";
+
+        return `
+          <article class="card">
+            <div class="card-img-wrap" onclick="openDetailModal('${item.id}')">
+              <span class="badge ${badgeClass}">${escapeHtml(item.category || 'Materiale')}</span>
+              ${multiControlsHtml}
+              ${imgHtml}
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" onclick="openDetailModal('${item.id}')">${escapeHtml(item.title)}</h3>
+              <div class="card-desc">${escapeHtml(item.description)}</div>
+              ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ""}
+              <div class="card-footer">
+                ${item.link
+                  ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener" class="card-link">🔗 Artikel &rarr;</a>`
+                  : `<span style="font-size:0.8rem; color:var(--text-muted);">Intet link</span>`
+                }
+                <div class="card-actions">
+                  <button class="icon-btn" title="Rediger" onclick="editItem('${item.id}')">✏️ Rediger</button>
+                  <button class="icon-btn" title="Slet" onclick="removeItem('${item.id}')">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    };
+
+    // --- MULTI-BILLEDE HÅNDTERING I FORMULAR ---
+    function renderFormGallery() {
+      const container = document.getElementById("formGalleryGrid");
+      document.getElementById("formImgCount").textContent = formImages.length;
+
+      if (formImages.length === 0) {
+        container.innerHTML = "";
+        return;
+      }
+
+      container.innerHTML = formImages.map((src, idx) => `
+        <div class="form-thumb-item ${idx === 0 ? 'is-cover' : ''}" title="${idx === 0 ? 'Forsidebillede (Cover)' : 'Klik for at gøre til forsidebillede'}" onclick="setAsCoverImage(${idx})">
+          <img src="${escapeHtml(src)}" alt="Billede ${idx + 1}" />
+          ${idx === 0 ? `<span class="cover-label">★ Cover</span>` : `<span class="cover-label" style="background:rgba(0,0,0,0.55);"> Sæt cover</span>`}
+          <button type="button" class="remove-thumb-btn" title="Fjern billede" onclick="removeFormImage(event, ${idx})">&times;</button>
+        </div>
+      `).join("");
+    }
+
+    function addImageToForm(src) {
+      if (!src || !src.trim()) return;
+      formImages.push(src.trim());
+      renderFormGallery();
+    }
+
+    window.addImageFromUrlInput = () => {
+      const input = document.getElementById("imageUrlInput");
+      const url = input.value.trim();
+      if (!url) return;
+      addImageToForm(url);
+      input.value = "";
+    };
+
+    window.removeFormImage = (e, idx) => {
+      e.stopPropagation();
+      formImages.splice(idx, 1);
+      renderFormGallery();
+    };
+
+    window.setAsCoverImage = (idx) => {
+      if (idx === 0 || idx < 0 || idx >= formImages.length) return;
+      const [chosen] = formImages.splice(idx, 1);
+      formImages.unshift(chosen);
+      renderFormGallery();
+    };
+
+    function compressImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxW = 820;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.76));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Lyt efter Ctrl+V (Paste) med ét eller flere billeder (kun når brugeren er logget ind)
+    window.addEventListener("paste", async (e) => {
+      if (!auth.currentUser) return;
+      const itemsClip = e.clipboardData?.items;
+      if (!itemsClip) return;
+
+      for (const clipItem of itemsClip) {
+        if (clipItem.type.startsWith("image/")) {
+          e.preventDefault();
+          const file = clipItem.getAsFile();
+          if (file) {
+            if (!document.getElementById("formModal").classList.contains("open")) {
+              openFormModal();
+            }
+            const dataUrl = await compressImageFile(file);
+            addImageToForm(dataUrl);
+          }
+        }
+      }
+    });
+
+    window.handleFileSelect = async (e) => {
+      const files = Array.from(e.target.files || []);
+      for (const file of files) {
+        if (file.type.startsWith("image/")) {
+          const dataUrl = await compressImageFile(file);
+          addImageToForm(dataUrl);
+        }
+      }
+      e.target.value = "";
+    };
+
+    const dropzone = document.getElementById("dropzone");
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const files = Array.from(e.dataTransfer?.files || []);
+      for (const file of files) {
+        if (file.type.startsWith("image/")) {
+          const dataUrl = await compressImageFile(file);
+          addImageToForm(dataUrl);
+        }
+      }
+    });
+
+    // Smart-indsæt parser til Gemini format
+    window.handleSmartPaste = (rawText) => {
+      if (!rawText || rawText.trim().length < 10) return;
+      const text = rawText.trim();
+
+      if (/byggeteknik|teknik\s*:/i.test(text)) {
+        document.getElementById("categoryInput").value = "Byggeteknik";
+      } else if (/materiale\s*:/i.test(text)) {
+        document.getElementById("categoryInput").value = "Materiale";
+      }
+
+      const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+      if (lines.length > 0) {
+        let firstLine = lines[0]
+          .replace(/^#+\s*/, "")
+          .replace(/^\d+\.\s*/, "")
+          .replace(/^(Materiale|Byggeteknik)\s*:\s*/i, "")
+          .replace(/\*\*/g, "")
+          .trim();
+        if (firstLine.length > 2 && firstLine.length < 120) {
+          document.getElementById("titleInput").value = firstLine;
+        }
+      }
+
+      const mdLinkMatch = text.match(/\]\((https?:\/\/[^\s)]+)\)/);
+      const rawUrlMatch = text.match(/https?:\/\/[^\s)]+/);
+      if (mdLinkMatch) {
+        document.getElementById("linkInput").value = mdLinkMatch[1];
+      } else if (rawUrlMatch) {
+        document.getElementById("linkInput").value = rawUrlMatch[0];
+      }
+
+      const descLines = lines.slice(1).filter(l => !/^(\*\s*)?🔗|\bArtikel\s*:/i.test(l));
+      const cleanDesc = descLines
+        .map(l => l.replace(/^\*\s+/, "• ").replace(/\*\*/g, ""))
+        .join("\n\n");
+
+      if (cleanDesc) {
+        document.getElementById("descInput").value = cleanDesc;
+      }
+
+      const autoTags = [];
+      if (/biobaseret|hamp|mycelium|halm|ler|kork|tang/i.test(text)) autoTags.push("Biobaseret");
+      if (/træ|clt|limtræ|cnc|tømrer|gran|bøg/i.test(text)) autoTags.push("Træ");
+      if (/co2-negativ|co₂-negativ/i.test(text)) autoTags.push("CO2-negativ");
+      if (/disassembly|adskillelse|genbrug|upcycling|cirkulær/i.test(text)) autoTags.push("Cirkulær");
+      if (/præfab/i.test(text)) autoTags.push("Præfabrikation");
+      if (/rammed earth|stamped earth|stampet jord/i.test(text)) autoTags.push("Stampet jord");
+
+      if (autoTags.length > 0 && !document.getElementById("tagsInput").value) {
+        document.getElementById("tagsInput").value = autoTags.join(", ");
+      }
+    };
+
+    // Gem eller opdater i Firestore
+    window.saveItem = async (e) => {
+      e.preventDefault();
+      const pendingUrl = document.getElementById("imageUrlInput").value.trim();
+      if (pendingUrl) {
+        addImageToForm(pendingUrl);
+        document.getElementById("imageUrlInput").value = "";
+      }
+
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Gemmer...";
+
+      const id = document.getElementById("itemId").value;
+      const payload = {
+        title: document.getElementById("titleInput").value.trim(),
+        category: document.getElementById("categoryInput").value,
+        images: formImages,
+        image: formImages[0] || "",
+        description: document.getElementById("descInput").value.trim(),
+        link: document.getElementById("linkInput").value.trim(),
+        tags: document.getElementById("tagsInput").value
+          .split(",")
+          .map(t => t.trim())
+          .filter(Boolean),
+        updatedBy: auth.currentUser?.email || auth.currentUser?.uid || null
+      };
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, "material_library", id), payload);
+        } else {
+          payload.createdAt = serverTimestamp();
+          await addDoc(colRef, payload);
+        }
+        closeFormModal();
+      } catch (err) {
+        alert("Kunne ikke gemme i Firestore: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Gem i Firestore";
+      }
+    };
+
+    // Seed de to første eksempler
+    window.seedStarterExamples = async () => {
+      const btn = document.getElementById("seedBtn");
+      btn.disabled = true;
+      btn.textContent = "Indlæser i Firestore...";
+
+      const examples = [
+        {
+          title: "Hampbeton (Hempcrete) & hamp-facadeplader",
+          category: "Materiale",
+          images: [
+            "https://materialcultures.org/wp-content/uploads/2021/11/Material-Cultures_Practice-Architecture_Flat-House_Image-Credit_Oskar-Proctor.jpg",
+            "https://images.adsttc.com/media/images/5e1b/c2ad/3312/fd68/4500/00b2/large_jpg/Flat_House_01.jpg",
+            "https://images.adsttc.com/media/images/5e1b/c884/3312/fd68/4500/00c7/large_jpg/Flat_House_18.jpg"
+          ],
+          image: "https://materialcultures.org/wp-content/uploads/2021/11/Material-Cultures_Practice-Architecture_Flat-House_Image-Credit_Oskar-Proctor.jpg",
+          description: "• Materialet: Hampbeton blandes af hampe-skærver, kalk og vand. Fordi industrihamp vokser lynhurtigt og optager store mængder CO₂, lagrer materialet mere CO₂, end der udledes ved produktionen (CO₂-negativt). Samtidig er det åndbart, fugtregulerende og modstandsdygtigt over for skimmel.\n\n• I praksis (Flat House, England): Opført af Practice Architecture og Material Cultures med hamp høstet direkte fra marken omkring huset. Ved at støbe hampbetonen i præfabrikerede træ-kassetter kunne råhuset samles på blot to dage. Yderbeklædningen består af bølgede plader presset af hampefibre og biobaseret harpiks fra landbrugsaffald.",
+          link: "https://materialcultures.org/flat-house/",
+          tags: ["Biobaseret", "CO2-negativ", "Hamp", "Præfabrikation"],
+          createdAt: serverTimestamp()
+        },
+        {
+          title: "CNC-fræsede træsamlinger uden stål og lim",
+          category: "Byggeteknik",
+          images: [
+            "https://static.dezeen.com/uploads/2023/03/tamedia-office-building-shigeru-ban-timber-revolution_dezeen_2364_col_17.jpg",
+            "https://static.dezeen.com/uploads/2023/03/tamedia-office-building-shigeru-ban-timber-revolution_dezeen_2364_col_6.jpg"
+          ],
+          image: "https://static.dezeen.com/uploads/2023/03/tamedia-office-building-shigeru-ban-timber-revolution_dezeen_2364_col_17.jpg",
+          description: "• Teknikken: Ved at kombinere traditionel japansk tømrerteknik (Kigumi) med 5-aksede CNC-robotfræsere kan massive træelementer låses sammen rent geometrisk med dyvler af hårdt bøgetræ. Det eliminerer stålbeslag, skruer og lim, så bygningen nemt kan skilles ad igen (Design for Disassembly), og træet forbliver 100 % rent.\n\n• I praksis (Tamedia Office Building, Zürich): Tegnet af arkitekt Shigeru Ban og ingeniør Hermann Blumer. Denne 7-etagers kontorbygning bæres udelukkende af 1.400 CNC-fræsede elementer i gran, hvor dobbelte søjler, tværbjælker og låsende bøgetræs-tapper står frit fremme som en synlig del af arkitekturen.",
+          link: "https://www.dezeen.com/2023/03/17/tamedia-office-building-shigeru-ban-timber-revolution/",
+          tags: ["Træ", "CNC", "Design for Disassembly", "Kigumi"],
+          createdAt: serverTimestamp()
+        }
+      ];
+
+      try {
+        for (const ex of examples) {
+          await addDoc(colRef, ex);
+        }
+      } catch (err) {
+        alert("Fejl ved indlæsning: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "⚡ Indlæs Hampbeton & Tamedia-eksemplerne";
+      }
+    };
+
+    // Modal-styring
+    window.openFormModal = () => {
+      document.getElementById("libraryForm").reset();
+      document.getElementById("itemId").value = "";
+      document.getElementById("smartPasteInput").value = "";
+      document.getElementById("imageUrlInput").value = "";
+      formImages = [];
+      renderFormGallery();
+      document.getElementById("modalTitle").textContent = "Tilføj til bibliotek";
+      document.getElementById("formModal").classList.add("open");
+    };
+
+    window.closeFormModal = () => {
+      document.getElementById("formModal").classList.remove("open");
+    };
+
+    window.editItem = (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      closeDetailModal();
+      openFormModal();
+      document.getElementById("modalTitle").textContent = "Rediger opslag";
+      document.getElementById("itemId").value = item.id;
+      document.getElementById("titleInput").value = item.title || "";
+      document.getElementById("categoryInput").value = item.category || "Materiale";
+      document.getElementById("descInput").value = item.description || "";
+      document.getElementById("linkInput").value = item.link || "";
+      document.getElementById("tagsInput").value = (item.tags || []).join(", ");
+      formImages = [...getItemImages(item)];
+      renderFormGallery();
+    };
+
+    window.removeItem = async (id) => {
+      if (!confirm("Er du sikker på, at du vil slette dette opslag?")) return;
+      await deleteDoc(doc(db, "material_library", id));
+      closeDetailModal();
+    };
+
+    // --- DETALJE-GALLERI STYRING ---
+    function renderDetailGallery() {
+      const wrap = document.getElementById("detailGalleryWrap");
+      if (activeDetailImages.length === 0) {
+        wrap.style.display = "none";
+        return;
+      }
+
+      wrap.style.display = "block";
+      document.getElementById("detailMainImg").src = activeDetailImages[activeDetailIndex];
+
+      const showNav = activeDetailImages.length > 1;
+      document.getElementById("stagePrevBtn").style.display = showNav ? "flex" : "none";
+      document.getElementById("stageNextBtn").style.display = showNav ? "flex" : "none";
+
+      const thumbsRow = document.getElementById("detailThumbsRow");
+      if (showNav) {
+        thumbsRow.style.display = "flex";
+        thumbsRow.innerHTML = activeDetailImages.map((src, idx) => `
+          <img src="${escapeHtml(src)}" class="detail-thumb ${idx === activeDetailIndex ? 'active' : ''}" onclick="setDetailImageIndex(${idx})" alt="Miniature ${idx + 1}" />
+        `).join("");
+      } else {
+        thumbsRow.style.display = "none";
+      }
+    }
+
+    window.setDetailImageIndex = (idx) => {
+      activeDetailIndex = idx;
+      renderDetailGallery();
+    };
+
+    window.stepDetailImage = (dir) => {
+      if (activeDetailImages.length <= 1) return;
+      activeDetailIndex = (activeDetailIndex + dir + activeDetailImages.length) % activeDetailImages.length;
+      renderDetailGallery();
+    };
+
+    window.addEventListener("keydown", (e) => {
+      if (!document.getElementById("detailModal").classList.contains("open")) return;
+      if (e.key === "ArrowRight") stepDetailImage(1);
+      if (e.key === "ArrowLeft") stepDetailImage(-1);
+      if (e.key === "Escape") closeDetailModal();
+    });
+
+    window.openDetailModal = (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      const badge = document.getElementById("detailBadge");
+      badge.textContent = item.category || "Materiale";
+      badge.className = "badge " + (item.category === "Byggeteknik" ? "byggeteknik" : "materiale");
+
+      document.getElementById("detailTitle").textContent = item.title || "";
+      document.getElementById("detailDesc").textContent = item.description || "";
+
+      activeDetailImages = getItemImages(item);
+      activeDetailIndex = cardImageIndexMap[id] || 0;
+      if (activeDetailIndex >= activeDetailImages.length) activeDetailIndex = 0;
+      renderDetailGallery();
+
+      document.getElementById("detailTags").innerHTML = (item.tags || [])
+        .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+        .join("");
+
+      const linkEl = document.getElementById("detailLink");
+      if (item.link) {
+        linkEl.href = item.link;
+        linkEl.style.display = "inline-flex";
+      } else {
+        linkEl.style.display = "none";
+      }
+
+      document.getElementById("detailEditBtn").onclick = () => editItem(item.id);
+      document.getElementById("detailDeleteBtn").onclick = () => removeItem(item.id);
+
+      document.getElementById("detailModal").classList.add("open");
+    };
+
+    window.closeDetailModal = () => {
+      document.getElementById("detailModal").classList.remove("open");
+    };
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
