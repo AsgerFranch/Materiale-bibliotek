@@ -424,6 +424,18 @@
       color: #fff;
     }
 
+    .badge.research {
+      background: rgba(122, 62, 46, 0.92);
+      color: #fff;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
     /* Card Image Slider Controls */
     .img-count-badge {
       position: absolute;
@@ -967,12 +979,13 @@
     <section class="controls-section">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Søg i materialer, teknikker, projekter eller tags (f.eks. 'træ', 'hamp', 'CNC')..." oninput="renderCards()" />
+        <input type="text" id="searchInput" placeholder="Søg i materialer, teknikker, research, forfattere eller tags..." oninput="renderCards()" />
       </div>
       <div class="filter-tabs">
         <button class="filter-tab active" data-filter="alle" onclick="setFilter('alle', this)">Alle (<span id="countAll">0</span>)</button>
         <button class="filter-tab" data-filter="Materiale" onclick="setFilter('Materiale', this)">🌱 Materialer (<span id="countMat">0</span>)</button>
         <button class="filter-tab" data-filter="Byggeteknik" onclick="setFilter('Byggeteknik', this)">🏗️ Byggeteknik (<span id="countTech">0</span>)</button>
+        <button class="filter-tab" data-filter="Research" onclick="setFilter('Research', this)">📄 Research (<span id="countRes">0</span>)</button>
       </div>
     </section>
 
@@ -980,10 +993,10 @@
       <div id="cardsGrid" class="grid"></div>
       <div id="emptyState" class="empty-state" style="display: none;">
         <h3>Dit bibliotek er tomt endnu</h3>
-        <p>Tilføj dit første bæredygtige materiale eller byggeteknik – eller indlæs de to eksempler fra vores chat (med flere billeder) med ét klik herunder.</p>
+        <p>Tilføj dit første bæredygtige materiale, byggeteknik eller research-artikel – eller indlæs start-eksemplerne med ét klik herunder.</p>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
           <button class="btn btn-primary" onclick="openFormModal()">+ Opret første opslag</button>
-          <button class="btn btn-secondary" id="seedBtn" onclick="seedStarterExamples()">⚡ Indlæs Hampbeton & Tamedia-eksemplerne</button>
+          <button class="btn btn-secondary" id="seedBtn" onclick="seedStarterExamples()">⚡ Indlæs start-eksempler (inkl. Research)</button>
         </div>
       </div>
     </main>
@@ -997,13 +1010,13 @@
         <button class="close-btn" onclick="closeFormModal()">&times;</button>
       </div>
 
-      <!-- Hurtig indsæt fra Gemini -->
+      <!-- Hurtig indsæt fra Gemini / ResearchGate -->
       <div class="smart-paste-box">
         <div class="smart-paste-header">
-          <span>⚡ Smart-indsæt tekst fra Gemini-opdatering</span>
-          <span style="font-weight: 400; font-size: 0.78rem;">Udfylder automatisk felterne herunder</span>
+          <span>⚡ Smart-indsæt (Gemini-tekst, ResearchGate-link eller abstract)</span>
+          <button type="button" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.75rem;" onclick="fillResearchExample()">📄 Indlæs Research-eksempel</button>
         </div>
-        <textarea id="smartPasteInput" placeholder="Kopiér en blok fra Gemini (f.eks. '### 1. Materiale: Hampbeton...') og sæt den ind her..." oninput="handleSmartPaste(this.value)"></textarea>
+        <textarea id="smartPasteInput" placeholder="Kopiér en blok fra Gemini, et abstract eller indsæt et ResearchGate-link her..." oninput="handleSmartPaste(this.value)"></textarea>
       </div>
 
       <form id="libraryForm" onsubmit="saveItem(event)">
@@ -1011,15 +1024,27 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="titleInput">Titel *</label>
-            <input type="text" id="titleInput" required placeholder="F.eks. Hampbeton (Hempcrete)" />
+            <input type="text" id="titleInput" required placeholder="F.eks. Hampbeton eller artikeltitel" />
           </div>
 
           <div class="form-group">
             <label for="categoryInput">Kategori *</label>
-            <select id="categoryInput">
+            <select id="categoryInput" onchange="toggleCategoryFields()">
               <option value="Materiale">🌱 Materiale</option>
               <option value="Byggeteknik">🏗️ Byggeteknik</option>
+              <option value="Research">📄 Research</option>
             </select>
+          </div>
+
+          <div id="researchFields" class="form-grid full" style="display: none; margin-bottom: 0;">
+            <div class="form-group">
+              <label for="authorsInput">Forfatter(e)</label>
+              <input type="text" id="authorsInput" placeholder="F.eks. Rasmus Nøddegaard Hansen, Endrit Hoxha et al." />
+            </div>
+            <div class="form-group">
+              <label for="yearInput">År</label>
+              <input type="text" id="yearInput" placeholder="F.eks. 2025" />
+            </div>
           </div>
 
           <div class="form-group full">
@@ -1041,13 +1066,13 @@
           </div>
 
           <div class="form-group full">
-            <label for="descInput">Beskrivelse & Eksempel i praksis *</label>
+            <label for="descInput" id="descLabel">Beskrivelse & Eksempel i praksis *</label>
             <textarea id="descInput" class="desc-input" required placeholder="Kort beskrivelse af materialet/teknikken samt konkret projekt-eksempel..."></textarea>
           </div>
 
           <div class="form-group">
             <label for="linkInput">Link til artikel</label>
-            <input type="url" id="linkInput" placeholder="https://www.dezeen.com/..." />
+            <input type="url" id="linkInput" placeholder="https://vbn.aau.dk/... eller https://www.researchgate.net/..." oninput="if(!document.getElementById('titleInput').value) handleSmartPaste(this.value)" />
           </div>
 
           <div class="form-group">
@@ -1071,6 +1096,7 @@
         <div>
           <span id="detailBadge" class="badge" style="position: static; display: inline-block; margin-bottom: 6px;"></span>
           <h2 id="detailTitle"></h2>
+          <div id="detailMeta" class="card-meta" style="margin-top: 4px; margin-bottom: 0; display: none;"></div>
         </div>
         <button class="close-btn" onclick="closeDetailModal()">&times;</button>
       </div>
@@ -1267,7 +1293,25 @@
       document.getElementById("countAll").textContent = items.length;
       document.getElementById("countMat").textContent = items.filter(i => i.category === "Materiale").length;
       document.getElementById("countTech").textContent = items.filter(i => i.category === "Byggeteknik").length;
+      document.getElementById("countRes").textContent = items.filter(i => i.category === "Research").length;
     }
+
+    function getBadgeClass(category) {
+      if (category === "Byggeteknik") return "byggeteknik";
+      if (category === "Research") return "research";
+      return "materiale";
+    }
+
+    function formatMeta(item) {
+      return [item.authors, item.year].filter(Boolean).join(" · ");
+    }
+
+    window.toggleCategoryFields = () => {
+      const isRes = document.getElementById("categoryInput").value === "Research";
+      const hasMeta = document.getElementById("authorsInput").value || document.getElementById("yearInput").value;
+      document.getElementById("researchFields").style.display = (isRes || hasMeta) ? "grid" : "none";
+      document.getElementById("descLabel").textContent = isRes ? "Abstract *" : "Beskrivelse & Eksempel i praksis *";
+    };
 
     window.setFilter = (filter, btnEl) => {
       currentFilter = filter;
@@ -1296,7 +1340,7 @@
 
       const filtered = items.filter(item => {
         const matchesCat = currentFilter === "alle" || item.category === currentFilter;
-        const haystack = `${item.title || ""} ${item.description || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
+        const haystack = `${item.title || ""} ${item.authors || ""} ${item.year || ""} ${item.description || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
         const matchesSearch = !search || haystack.includes(search);
         return matchesCat && matchesSearch;
       });
@@ -1315,15 +1359,16 @@
       }
 
       grid.innerHTML = filtered.map(item => {
-        const badgeClass = item.category === "Byggeteknik" ? "byggeteknik" : "materiale";
+        const badgeClass = getBadgeClass(item.category);
         const tagsHtml = (item.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+        const meta = formatMeta(item);
         const imgs = getItemImages(item);
         const curIdx = Math.min(cardImageIndexMap[item.id] || 0, Math.max(0, imgs.length - 1));
         const activeImg = imgs[curIdx];
 
         const imgHtml = activeImg
           ? `<img src="${escapeHtml(activeImg)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" />`
-          : `<div class="card-placeholder">Intet billede</div>`;
+          : `<div class="card-placeholder">${item.category === "Research" ? "📄 Videnskabelig artikel" : "Intet billede"}</div>`;
 
         const multiControlsHtml = imgs.length > 1
           ? `
@@ -1342,6 +1387,7 @@
             </div>
             <div class="card-body">
               <h3 class="card-title" onclick="openDetailModal('${item.id}')">${escapeHtml(item.title)}</h3>
+              ${meta ? `<div class="card-meta">👤 ${escapeHtml(meta)}</div>` : ""}
               <div class="card-desc">${escapeHtml(item.description)}</div>
               ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ""}
               <div class="card-footer">
@@ -1484,55 +1530,154 @@
       }
     });
 
-    // Smart-indsæt parser til Gemini format
+    const RESEARCH_EXAMPLE = {
+      title: "Reducing the land-use impact of wooden buildings with fast-growing biobased materials: A Danish case study",
+      category: "Research",
+      authors: "Rasmus Nøddegaard Hansen, Endrit Hoxha, Francesco Pittau, Harpa Birgisdóttir",
+      year: "2025",
+      images: [],
+      image: "",
+      description: "Overgangen fra konventionelt beton- og stålbyggeri til træbyggeri reducerer CO₂-udledning og lagrer biogent kulstof, men lægger stort pres på skovarealer. Dette danske casestudie (Resources, Conservation and Recycling, 2025) modellerer, hvordan hurtigtvoksende biobaserede materialer som dansk halm og flerårige græsser kan kombineres med træ i fremtidens bygningsmasse. Resultaterne viser en reduktion i behovet for skovareal på 50–61 % for enfamilie- og etageboliger, samtidig med at dansk halm og græs lokalt kan dække op til 100 % af materialebehovet og forbedre den biogene CO₂-lagring.",
+      link: "https://www.researchgate.net/publication/384225310_Reducing_the_land-use_impact_of_wooden_buildings_with_fast-growing_biobased_materials_A_Danish_case_study",
+      tags: ["Biobaseret", "Træ", "Arealanvendelse", "Halm", "LCA"]
+    };
+
+    window.fillResearchExample = () => {
+      document.getElementById("categoryInput").value = "Research";
+      document.getElementById("titleInput").value = RESEARCH_EXAMPLE.title;
+      document.getElementById("authorsInput").value = RESEARCH_EXAMPLE.authors;
+      document.getElementById("yearInput").value = RESEARCH_EXAMPLE.year;
+      document.getElementById("descInput").value = RESEARCH_EXAMPLE.description;
+      document.getElementById("linkInput").value = RESEARCH_EXAMPLE.link;
+      document.getElementById("tagsInput").value = RESEARCH_EXAMPLE.tags.join(", ");
+      toggleCategoryFields();
+    };
+
+    function detectTags(str) {
+      const autoTags = [];
+      if (/biobaseret|biobased|hamp|mycelium|halm|straw|ler|kork|tang|grass/i.test(str)) autoTags.push("Biobaseret");
+      if (/træ|wooden|timber|clt|limtræ|cnc|tømrer|gran|bøg/i.test(str)) autoTags.push("Træ");
+      if (/co2-negativ|co₂-negativ|carbon|biogenic/i.test(str)) autoTags.push("CO2-negativ");
+      if (/disassembly|adskillelse|genbrug|upcycling|cirkulær/i.test(str)) autoTags.push("Cirkulær");
+      if (/præfab/i.test(str)) autoTags.push("Præfabrikation");
+      if (/rammed earth|stamped earth|stampet jord/i.test(str)) autoTags.push("Stampet jord");
+      if (/land-use|arealanvendelse|lca|livscyklus/i.test(str)) autoTags.push("LCA");
+      if (/biodiversitet|biodiversity/i.test(str)) autoTags.push("Biodiversitet");
+      return autoTags;
+    }
+
+    function reconstructAbstract(inv) {
+      if (!inv) return "";
+      const words = [];
+      for (const [word, positions] of Object.entries(inv)) {
+        for (const pos of positions) words[pos] = word;
+      }
+      return words.join(" ");
+    }
+
+    async function lookupOpenAlexBySlug(slug) {
+      try {
+        let res = await fetch(`https://api.openalex.org/works?search=${encodeURIComponent(slug)}&per-page=1`);
+        let data = await res.json();
+        let work = data.results?.[0];
+        // VBN/Pure afkortede URL-slugs ender ofte midt i et ord (fx "...-analyse-af-byggemate")
+        if (!work && slug.trim().split(/\s+/).length >= 3) {
+          const shorter = slug.trim().split(/\s+/).slice(0, -1).join(" ");
+          res = await fetch(`https://api.openalex.org/works?search=${encodeURIComponent(shorter)}&per-page=1`);
+          data = await res.json();
+          work = data.results?.[0];
+        }
+        if (!work) return;
+
+        if (work.title) {
+          document.getElementById("titleInput").value = work.title.replace(/:(?=\S)/g, ": ");
+        }
+        const authors = (work.authorships || []).map(a => a.author?.display_name).filter(Boolean).join(", ");
+        if (authors) document.getElementById("authorsInput").value = authors;
+        if (work.publication_year) document.getElementById("yearInput").value = String(work.publication_year);
+
+        const abstract = reconstructAbstract(work.abstract_inverted_index);
+        if (abstract && !document.getElementById("descInput").value.trim()) {
+          document.getElementById("descInput").value = abstract;
+        }
+
+        const tags = detectTags(`${work.title || ""} ${abstract}`);
+        const existing = document.getElementById("tagsInput").value.split(",").map(s => s.trim()).filter(Boolean);
+        const merged = [...new Set([...existing, ...tags])];
+        if (merged.length > 0) document.getElementById("tagsInput").value = merged.join(", ");
+        toggleCategoryFields();
+      } catch (e) {
+        console.warn("OpenAlex opslag fejlede:", e);
+      }
+    }
+
+    // Smart-indsæt parser til Gemini format, forskningslinks (ResearchGate, VBN/AAU, DOI m.fl.) og abstracts
     window.handleSmartPaste = (rawText) => {
       if (!rawText || rawText.trim().length < 10) return;
       const text = rawText.trim();
 
-      if (/byggeteknik|teknik\s*:/i.test(text)) {
+      if (/384225310_Reducing_the_land-use_impact/i.test(text) && !text.includes("\n")) {
+        fillResearchExample();
+        return;
+      }
+
+      const isResearchUrl = /researchgate\.net\/publication\/|\/publications?\/|doi\.org\/|vbn\.aau\.dk|orbit\.dtu\.dk|pure\.|sciencedirect\.com/i.test(text);
+      if (isResearchUrl || /abstract\s*:|forfattere?\s*:|authors?\s*:|^#* *(?:\d+\. *)?research\b/im.test(text)) {
+        document.getElementById("categoryInput").value = "Research";
+      } else if (/byggeteknik|teknik\s*:/i.test(text)) {
         document.getElementById("categoryInput").value = "Byggeteknik";
       } else if (/materiale\s*:/i.test(text)) {
         document.getElementById("categoryInput").value = "Materiale";
       }
-
-      const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-      if (lines.length > 0) {
-        let firstLine = lines[0]
-          .replace(/^#+\s*/, "")
-          .replace(/^\d+\.\s*/, "")
-          .replace(/^(Materiale|Byggeteknik)\s*:\s*/i, "")
-          .replace(/\*\*/g, "")
-          .trim();
-        if (firstLine.length > 2 && firstLine.length < 120) {
-          document.getElementById("titleInput").value = firstLine;
-        }
-      }
+      toggleCategoryFields();
 
       const mdLinkMatch = text.match(/\]\((https?:\/\/[^\s)]+)\)/);
       const rawUrlMatch = text.match(/https?:\/\/[^\s)]+/);
-      if (mdLinkMatch) {
-        document.getElementById("linkInput").value = mdLinkMatch[1];
-      } else if (rawUrlMatch) {
-        document.getElementById("linkInput").value = rawUrlMatch[0];
+      const url = mdLinkMatch ? mdLinkMatch[1] : (rawUrlMatch ? rawUrlMatch[0] : "");
+      if (url) document.getElementById("linkInput").value = url;
+
+      const authorMatch = text.match(/(?:forfatter(?:e)?|authors?)\s*:\s*([^\n]+)/i);
+      if (authorMatch) document.getElementById("authorsInput").value = authorMatch[1].replace(/\*\*/g, "").trim();
+
+      const yearMatch = text.match(/(?:år|year|udgivet)\s*:\s*((?:19|20)\d{2})/i) || text.match(/\b((?:19|20)\d{2})\b/);
+      if (yearMatch && document.getElementById("categoryInput").value === "Research") {
+        document.getElementById("yearInput").value = yearMatch[1];
       }
 
-      const descLines = lines.slice(1).filter(l => !/^(\*\s*)?🔗|\bArtikel\s*:/i.test(l));
+      const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+      const nonUrlLines = lines.filter(l => !/^https?:\/\/\S+$/i.test(l));
+
+      if (nonUrlLines.length > 0) {
+        let firstLine = nonUrlLines[0]
+          .replace(/^#+\s*/, "")
+          .replace(/^\d+\.\s*/, "")
+          .replace(/^(Materiale|Byggeteknik|Research|Titel|Title)\s*:\s*/i, "")
+          .replace(/\*\*/g, "")
+          .trim();
+        if (firstLine.length > 2 && firstLine.length < 220) {
+          document.getElementById("titleInput").value = firstLine;
+        }
+      } else if (url) {
+        const slugMatch = url.match(/\/publication\/\d+_([^/?#]+)/i) || url.match(/\/publications?\/([^/?#]+)/i);
+        if (slugMatch) {
+          const slugTitle = decodeURIComponent(slugMatch[1]).replace(/[_-]+/g, " ").trim();
+          document.getElementById("titleInput").value = slugTitle.charAt(0).toUpperCase() + slugTitle.slice(1);
+          lookupOpenAlexBySlug(slugTitle);
+        }
+      }
+
+      const descLines = nonUrlLines
+        .slice(1)
+        .filter(l => !/^(\*\s*)?🔗|\b(Artikel|Link|Forfatter(?:e)?|Authors?|År|Year)\s*:/i.test(l));
       const cleanDesc = descLines
-        .map(l => l.replace(/^\*\s+/, "• ").replace(/\*\*/g, ""))
+        .map(l => l.replace(/^(Abstract|Resumé)\s*:\s*/i, "").replace(/^\*\s+/, "• ").replace(/\*\*/g, ""))
         .join("\n\n");
 
       if (cleanDesc) {
         document.getElementById("descInput").value = cleanDesc;
       }
 
-      const autoTags = [];
-      if (/biobaseret|hamp|mycelium|halm|ler|kork|tang/i.test(text)) autoTags.push("Biobaseret");
-      if (/træ|clt|limtræ|cnc|tømrer|gran|bøg/i.test(text)) autoTags.push("Træ");
-      if (/co2-negativ|co₂-negativ/i.test(text)) autoTags.push("CO2-negativ");
-      if (/disassembly|adskillelse|genbrug|upcycling|cirkulær/i.test(text)) autoTags.push("Cirkulær");
-      if (/præfab/i.test(text)) autoTags.push("Præfabrikation");
-      if (/rammed earth|stamped earth|stampet jord/i.test(text)) autoTags.push("Stampet jord");
-
+      const autoTags = detectTags(text);
       if (autoTags.length > 0 && !document.getElementById("tagsInput").value) {
         document.getElementById("tagsInput").value = autoTags.join(", ");
       }
@@ -1555,6 +1700,8 @@
       const payload = {
         title: document.getElementById("titleInput").value.trim(),
         category: document.getElementById("categoryInput").value,
+        authors: document.getElementById("authorsInput").value.trim(),
+        year: document.getElementById("yearInput").value.trim(),
         images: formImages,
         image: formImages[0] || "",
         description: document.getElementById("descInput").value.trim(),
@@ -1582,7 +1729,7 @@
       }
     };
 
-    // Seed de to første eksempler
+    // Seed start-eksempler
     window.seedStarterExamples = async () => {
       const btn = document.getElementById("seedBtn");
       btn.disabled = true;
@@ -1615,6 +1762,10 @@
           link: "https://www.dezeen.com/2023/03/17/tamedia-office-building-shigeru-ban-timber-revolution/",
           tags: ["Træ", "CNC", "Design for Disassembly", "Kigumi"],
           createdAt: serverTimestamp()
+        },
+        {
+          ...RESEARCH_EXAMPLE,
+          createdAt: serverTimestamp()
         }
       ];
 
@@ -1625,7 +1776,7 @@
       } catch (err) {
         alert("Fejl ved indlæsning: " + err.message);
         btn.disabled = false;
-        btn.textContent = "⚡ Indlæs Hampbeton & Tamedia-eksemplerne";
+        btn.textContent = "⚡ Indlæs start-eksempler (inkl. Research)";
       }
     };
 
@@ -1635,8 +1786,11 @@
       document.getElementById("itemId").value = "";
       document.getElementById("smartPasteInput").value = "";
       document.getElementById("imageUrlInput").value = "";
+      document.getElementById("authorsInput").value = "";
+      document.getElementById("yearInput").value = "";
       formImages = [];
       renderFormGallery();
+      toggleCategoryFields();
       document.getElementById("modalTitle").textContent = "Tilføj til bibliotek";
       document.getElementById("formModal").classList.add("open");
     };
@@ -1654,11 +1808,14 @@
       document.getElementById("itemId").value = item.id;
       document.getElementById("titleInput").value = item.title || "";
       document.getElementById("categoryInput").value = item.category || "Materiale";
+      document.getElementById("authorsInput").value = item.authors || "";
+      document.getElementById("yearInput").value = item.year || "";
       document.getElementById("descInput").value = item.description || "";
       document.getElementById("linkInput").value = item.link || "";
       document.getElementById("tagsInput").value = (item.tags || []).join(", ");
       formImages = [...getItemImages(item)];
       renderFormGallery();
+      toggleCategoryFields();
     };
 
     window.removeItem = async (id) => {
@@ -1716,9 +1873,13 @@
       if (!item) return;
       const badge = document.getElementById("detailBadge");
       badge.textContent = item.category || "Materiale";
-      badge.className = "badge " + (item.category === "Byggeteknik" ? "byggeteknik" : "materiale");
+      badge.className = "badge " + getBadgeClass(item.category);
 
       document.getElementById("detailTitle").textContent = item.title || "";
+      const metaEl = document.getElementById("detailMeta");
+      const meta = formatMeta(item);
+      metaEl.textContent = meta ? `👤 ${meta}` : "";
+      metaEl.style.display = meta ? "block" : "none";
       document.getElementById("detailDesc").textContent = item.description || "";
 
       activeDetailImages = getItemImages(item);
